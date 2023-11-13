@@ -1,0 +1,123 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+
+\title{DA1337/1338 Homework 6}
+\author{tombergm}
+\date{November 2023}
+
+\fancyhead[L]{tombergm}
+\pagestyle{fancy}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\renewcommand{\contentsname}{Innehållsförteckning}
+\tableofcontents
+
+\pagebreak
+\section{Induktion}
+
+\subsection{Problem 1}
+Vi har ett påstående $P(n)$:
+\[ P(n) \Leftrightarrow \sum_{i=1}^{n}{i^2} = \frac{n(n + 1)(2n + 1)}{6} \]
+Basfall $P(1)$:
+\[ \sum_{i=1}^{1}{i^2} = 1^2 = \frac{1(1 + 1)(2 \cdot 1 + 1)}{6} \Rightarrow P(1) \]
+Induktionssteg; Antag $ P(n - 1) $:
+\begin{align*}
+\sum_{i=1}^{n}{i^2} & = \sum_{i=1}^{n - 1}{i^2} + n^2 \\
+                    & = \frac{(n - 1)(n)(2n - 1)}{6} + n^2 \\
+                    & = \frac{2n^3 - 3n^2 + n}{6} + \frac{6n^2}{6} \\
+                    & = \frac{2n^3 + 3n^2 + n}{6} \\
+                    & = \frac{n(n + 1)(2n + 1)}{6} \\
+                    & \Rightarrow P(n)
+\end{align*}
+Vi har
+\[ P(1) \land \left[P(n - 1) \Rightarrow P(n)\right] \]
+V.S.B.
+
+\subsection{Problem 2}
+\[ P(n) \Leftrightarrow \sum_{j=1}^{n}{2j - 1} = n^2 \]
+Basfall $ P(1) $:
+\[ \sum_{j=1}^{1}{2j - 1} = (2 \cdot 1 - 1) = 1^2 \Rightarrow P(1) \]
+Induktionssteg; Antag $ P(n - 1) $:
+\[
+\begin{aligned}
+\sum_{j=1}^{n}{2j - 1} & = \sum_{j=1}^{n - 1}{2j - 1} + (2n - 1) \\
+                       & = (n - 1)^2 + (2n - 1) \\
+                       & = (n^2 - 2n + 1) + (2n - 1) \\
+                       & = n^2 \\
+\Rightarrow P(n)
+\end{aligned}
+\]
+Därmed
+\[ P(1) \land \left[P(n - 1) \Rightarrow P(n)\right] \]
+V.S.B.
+
+\section{Iterativ korrekthet}
+Vi har en funktion $\operatorname{expIterative}(x, n) = f(x, n)$.
+I början av loopen är
+\[ res = res_0 = 1 = x^0 \]
+I slutet av iteration $i$ är
+\[ res = res_{i + 1} = res_i \cdot x = x^i \cdot x = x^{i + 1} \]
+Den sista iterationen är iteration $n - 1$.
+Efter loopen är
+\[ res = res_{n - 1 + 1} = res_n = x^n \]
+Returvärdet är
+\[ f(x, n) = res_n = x^n \]
+Antalet iterationer är $n$. Tidskomplexiteten är $ T(n) \in O(n)$.
+
+\section{Rekursiv korrekthet}
+Vi har en funktion $\operatorname{expRecursive}(x, n) = g(x, n)$.
+\[
+g(x, n) =
+\begin{cases}
+f(x, n) = x^n & 0 \leq n \leq 4 \\
+g(x, \lfloor \frac{n}{2} \rfloor) \cdot g(x, \lfloor \frac{n + 1}{2} \rfloor) & n > 4
+\end{cases}
+\]
+Låt påståendet $P(n)$:
+\[ P(n) \Leftrightarrow g(x, n) = x^n \]
+Vi har basfallen
+\begin{equation}
+\label{eq:gn}
+g(x, n) = f(x, n) = x^n \Rightarrow P(n), n \in \left\{0, 1, 2, 3, 4\right\}
+\end{equation}
+Induktionsteg; Antag $ P(k), 2k > 4 $:
+\begin{equation}
+\label{eq:g2k}
+g(x, 2k) = g(x, k) \cdot g(x, k) = x^k \cdot x^k = x^{2k} \Rightarrow P(2k)
+\end{equation}
+och $ P(k) \land P(k + 1), 2k + 1 > 4 $:
+\begin{equation}
+\label{eq:g2kp1}
+g(x, 2k + 1) = g(x, k) \cdot g(x, k + 1) = x^{k} \cdot x^{k + 1} = x^{2k + 1} \Rightarrow P(2k + 1)
+\end{equation}
+Dessa två induktionssteg tillsammans med basfallen ger $ P(n) $ för $ n \in \mathbb{N} $, e.g.
+\begin{gather*}
+\begin{aligned}
+P(2) \land P(3) & \Rightarrow &             & P(5)  && \text{enligt \eqref{eq:g2kp1}} \\
+P(3) \land P(4) & \Rightarrow & P(6) \land  & P(7)  && \text{enligt \eqref{eq:g2k} och \eqref{eq:g2kp1}} \\
+P(4) \land P(5) & \Rightarrow & P(8) \land  & P(9)  && \text{enligt \eqref{eq:g2k} och \eqref{eq:g2kp1}} \\
+P(5) \land P(6) & \Rightarrow & P(10) \land & P(11) && \text{enligt \eqref{eq:g2k} och \eqref{eq:g2kp1}} \\
+\dots
+\end{aligned}
+\end{gather*}
+
+Tidskomplexiteten är av den rekursiva formen
+\[ T(n) = aT\left(\frac{n}{b}\right) + f(n) \]
+där
+\begin{align*}
+a    & = 2 \\
+b    & = 2 \\
+f(n) & \in \Theta(1) && \text{då $n \leq 4$ för alla
+$\operatorname{expIterative}(x, n)$ i $\operatorname{expRecursive}$}
+\end{align*}
+Mästarsatsen ger
+\[ T(n) \in \Theta(n^{log_b a}) = \Theta(n) \]
+
+\end{document}
